@@ -4,9 +4,10 @@
 angular.module('ld30App')
         .controller('GameCtrl', function(
                 graphicService,
+                gameOptionsService,
                 Player,
-                Planet,
-                $scope
+                Planet
+                // $scope
                 ) {
 
             function init(width, height, canvasFrame) {
@@ -18,13 +19,19 @@ angular.module('ld30App')
                 time = Date.now();
                 w = window;
                 gfx = graphicService();
-
+                
+                console.log(gameOptionsService.difficulty);
+                
                 addEventListener('keydown', function(e) {
                     keysDown[e.keyCode] = true;
                 }, false);
 
                 addEventListener('keyup', function(e) {
                     delete keysDown[e.keyCode];
+                }, false);
+
+                canvas.addEventListener('click', function(e) {
+                    click(e);
                 }, false);
 
                 player = new Player('test', 0, 0);
@@ -58,8 +65,10 @@ angular.module('ld30App')
             function planetGenerator(counter) {
                 do {
                     var radius = Math.floor((Math.random() * 60) + 21);
+
                     var x = Math.floor((Math.random() * canvas.width) + 1) + (radius / 2);
                     var y = Math.floor((Math.random() * canvas.height) + 1);
+
                     var p = new Planet('planet' + counter, x, y, radius);
                     // p.showName();
                     planets.push(p);
@@ -84,17 +93,17 @@ angular.module('ld30App')
 
                 renderPlanets(ctx);
             }
-
-            function detectPlanetOnClick(x, y){
-                for(var i = 0; i < planets.length; i++){
-                    planets.p
-                }
-            }
-            
-            $scope.click = function(event) {
+            /*
+             function detectPlanetOnClick(x, y) {
+             for (var i = 0; i < planets.length; i++) {
+             
+             }
+             }
+             */
+            function click(event) {
                 console.log('clicked');
                 console.log('x: ' + event.offsetX + ' - y: ' + event.offsetY);
-            };
+            }
 
             function mainLoop() {
                 var now = Date.now();
@@ -102,7 +111,7 @@ angular.module('ld30App')
                 var framerate = parseInt(1000 / delta);
 
                 update(delta / 1000);
-                render(ctx, gfx, framerate, planets);
+                render(ctx, gfx, framerate);
 
                 time = now;
 
@@ -114,11 +123,12 @@ angular.module('ld30App')
             var canvas;
             var ctx;
             var gfx;
-            var frameWidth = 800;
-            var frameHeight = 600;
+            var frameWidth = 1024;
+            var frameHeight = 768;
             var keysDown = {};
             var player;
             var planets = [];
+            var difficulty;
 
             init(frameWidth, frameHeight, 'gameframe');
             mainLoop();

@@ -1,13 +1,28 @@
 
-
-
-<!-- 
-add option for player name and difficult
--->
-
 <div>
-    <h1 class="cover-heading"> name of the game </h1>
-    <p class="lead">i just want to add a description here ... let's see </p>
+    <h1 class="cover-heading"> World Connecting </h1>
+    <p class="lead"> how to play, description and stuff like that ... </p>
+
+    <br>
+
+    <strong> Difficulty: </strong>
+    <br>
+    <div class="btn-group" data-toggle="buttons">
+        <label ng-click="clickDifficultyOption(1)" class="btn btn-default">
+            <input type="radio"> easy
+        </label>
+        <label ng-click="clickDifficultyOption(2)" class="btn btn-default active">
+            <input type="radio"> medium
+        </label>
+        <label ng-click="clickDifficultyOption(3)" class="btn btn-default">
+            <input type="radio"> hard
+        </label>
+    </div>
+
+    <br>
+
+    <hr>
+
     <p class="lead">
         <a ng-href="#/game" class="btn btn-lg btn-primary"> Start Game </a>
     </p>

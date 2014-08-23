@@ -4,7 +4,6 @@
 
 angular.module('ld30App')
         .service('graphicService', function() {
-
             return function() {
 
                 var gfx;
