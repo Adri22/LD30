@@ -6,9 +6,9 @@ angular.module('ld30App')
         .factory('Player', function() {
 
             var Player = function(name, x, y) {
-                var name = name;
-                var xPos = x;
-                var yPos = y;
+                this.name = name;
+                this.xPos = x;
+                this.yPos = y;
             };
 
             Player.prototype.showName = function() {

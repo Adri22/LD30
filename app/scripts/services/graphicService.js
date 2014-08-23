@@ -12,16 +12,8 @@ angular.module('ld30App')
                 var bgImage = new Image();
                 bgImage.src = 'images/background1.png';
 
-                var heroImage = new Image();
-                heroImage.src = 'images/player_test4.png';
-
-                var monsterImage = new Image();
-                monsterImage.src = 'images/monster_test2.png';
-
                 gfx = {
-                    'bgImage': bgImage,
-                    'heroImage': heroImage,
-                    'monsterImage': monsterImage
+                    'bgImage': bgImage
                 };
 
                 return gfx;

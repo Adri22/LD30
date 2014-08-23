@@ -13,9 +13,9 @@ angular.module('ld30App')
                 ctx.fillText('hud text and some values here', 32, 32);
             }
 
-            return function(ctx, gfx) {
+            return function(ctx) {
                 // ctx.drawImage(, 0, 0);
-                ctx.putImageData(ctx.createImageData(800, 600), 0, 0);
+                
                 drawHUD(ctx);
             };
 

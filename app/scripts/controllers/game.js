@@ -4,9 +4,9 @@
 angular.module('ld30App')
         .controller('GameCtrl', function(
                 graphicService,
-                renderService,
-                Player
-                // $scope
+                Player,
+                Planet,
+                $scope
                 ) {
 
             function init(width, height, canvasFrame) {
@@ -17,6 +17,7 @@ angular.module('ld30App')
                 canvas.height = height;
                 time = Date.now();
                 w = window;
+                gfx = graphicService();
 
                 addEventListener('keydown', function(e) {
                     keysDown[e.keyCode] = true;
@@ -26,18 +27,17 @@ angular.module('ld30App')
                     delete keysDown[e.keyCode];
                 }, false);
 
-                gfx = graphicService();
-                player = new Player();
-                reset();
+                player = new Player('test', 0, 0);
+
+                planetGenerator(10);
             }
 
-            function reset() {
-                player.getPosition().x = canvas.width / 2;
-                player.getPosition().y = canvas.height / 2;
-
-                monster.x = 32 + (Math.random() * (canvas.width - 64));
-                monster.y = 32 + (Math.random() * (canvas.height - 64));
-            }
+            /*
+             function reset() {
+             player.getPosition().x = canvas.width / 2;
+             player.getPosition().y = canvas.height / 2;
+             }
+             */
 
             function update(timeModifier) {
 
@@ -53,16 +53,48 @@ angular.module('ld30App')
                 if (keysDown[39]) {
                     player.getPosition().x += 1 * timeModifier;
                 }
+            }
 
-                if (
-                        player.getPosition().x <= (monster.x + 32) &&
-                        monster.x <= (player.getPosition().x + 32) &&
-                        player.getPosition().y <= (monster.y + 32) &&
-                        monster.y <= (player.getPosition().y + 32)
-                        ) {
-                    reset();
+            function planetGenerator(counter) {
+                do {
+                    var radius = Math.floor((Math.random() * 60) + 21);
+                    var x = Math.floor((Math.random() * canvas.width) + 1) + (radius / 2);
+                    var y = Math.floor((Math.random() * canvas.height) + 1);
+                    var p = new Planet('planet' + counter, x, y, radius);
+                    // p.showName();
+                    planets.push(p);
+                    counter--;
+                } while (counter > 0);
+            }
+
+            function renderPlanets(ctx) {
+                for (var i = 0; i < planets.length; i++) {
+                    planets[i].renderPlanet(ctx);
                 }
             }
+
+            function render(ctx, gfx, fps) {
+                ctx.drawImage(gfx.bgImage, 0, 0);
+
+                ctx.fillStyle = 'rgb(255, 255, 255)';
+                ctx.font = '15px Helvetica';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.fillText('fps: ' + fps, 5, 5);
+
+                renderPlanets(ctx);
+            }
+
+            function detectPlanetOnClick(x, y){
+                for(var i = 0; i < planets.length; i++){
+                    planets.p
+                }
+            }
+            
+            $scope.click = function(event) {
+                console.log('clicked');
+                console.log('x: ' + event.offsetX + ' - y: ' + event.offsetY);
+            };
 
             function mainLoop() {
                 var now = Date.now();
@@ -70,15 +102,9 @@ angular.module('ld30App')
                 var framerate = parseInt(1000 / delta);
 
                 update(delta / 1000);
-                renderService(ctx, gfx);
+                render(ctx, gfx, framerate, planets);
 
                 time = now;
-
-                ctx.fillStyle = 'rgb(0, 0, 0)';
-                ctx.font = '15px Helvetica';
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'top';
-                ctx.fillText('fps: ' + framerate, 5, 5);
 
                 w.requestAnimationFrame(mainLoop);
             }
@@ -92,10 +118,7 @@ angular.module('ld30App')
             var frameHeight = 600;
             var keysDown = {};
             var player;
-
-            var monster = {};
-
-
+            var planets = [];
 
             init(frameWidth, frameHeight, 'gameframe');
             mainLoop();
