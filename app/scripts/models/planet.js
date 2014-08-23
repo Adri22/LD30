@@ -10,10 +10,12 @@ angular.module('ld30App')
                 this.xPos = x;
                 this.yPos = y;
                 this.radius = r;
+                this.selected = false;
+                this.strokeStyle = '#003300';
+                this.lineWidth = 1;
             };
 
             Planet.prototype.showName = function() {
-                console.log(this.name);
                 return this.name;
             };
 
@@ -29,13 +31,28 @@ angular.module('ld30App')
                 this.yPos = y;
             };
 
+            Planet.prototype.getRadius = function() {
+                return this.radius;
+            };
+
+            Planet.prototype.setSelection = function(s) {
+                this.selected = s;
+                if (this.selected) {
+                    this.strokeStyle = '#ff0000';
+                    this.lineWidth = 3;
+                } else {
+                    this.strokeStyle = '#003300';
+                    this.lineWidth = 1;
+                }
+            };
+
             Planet.prototype.renderPlanet = function(ctx) {
                 ctx.beginPath();
                 ctx.arc(this.xPos, this.yPos, this.radius, 0, 2 * Math.PI, false);
                 ctx.fillStyle = 'green';
                 ctx.fill();
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = '#003300';
+                ctx.lineWidth = this.lineWidth;
+                ctx.strokeStyle = this.strokeStyle;
                 ctx.stroke();
             };
 

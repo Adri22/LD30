@@ -19,9 +19,8 @@ angular.module('ld30App')
                 time = Date.now();
                 w = window;
                 gfx = graphicService();
-                
-                console.log(gameOptionsService.difficulty);
-                
+                difficulty = gameOptionsService.getDifficulty();
+
                 addEventListener('keydown', function(e) {
                     keysDown[e.keyCode] = true;
                 }, false);
@@ -36,7 +35,7 @@ angular.module('ld30App')
 
                 player = new Player('test', 0, 0);
 
-                planetGenerator(10);
+                planetGenerator();
             }
 
             /*
@@ -62,9 +61,26 @@ angular.module('ld30App')
                 }
             }
 
-            function planetGenerator(counter) {
+            function planetGenerator() {
+
+                var counter = null;
+                switch (difficulty) {
+                    case 1:
+                        counter = 5;
+                        break;
+                    case 2:
+                        counter = 10;
+                        break;
+                    case 3:
+                        counter = 15;
+                        break;
+                    default:
+                        counter = 5;
+                        break;
+                }
+
                 do {
-                    var radius = Math.floor((Math.random() * 60) + 21);
+                    var radius = Math.floor((Math.random() * 60) + 20);
 
                     var x = Math.floor((Math.random() * canvas.width) + 1) + (radius / 2);
                     var y = Math.floor((Math.random() * canvas.height) + 1);
@@ -93,16 +109,28 @@ angular.module('ld30App')
 
                 renderPlanets(ctx);
             }
-            /*
-             function detectPlanetOnClick(x, y) {
-             for (var i = 0; i < planets.length; i++) {
-             
-             }
-             }
-             */
+
+            function detectPlanetOnClick(x, y) {
+                for (var i = 0; i < planets.length; i++) {
+                    var planetPos = planets[i].getPosition();
+                    var planetRadius = planets[i].getRadius();
+                    if (
+                            (x > (planetPos.x - planetRadius)) &&
+                            (x < (planetPos.x + planetRadius)) &&
+                            (y > (planetPos.y - planetRadius)) &&
+                            (y < (planetPos.y + planetRadius))
+                            ) {
+                        console.log('planet clicked: ' + planets[i].showName());
+                        planets[i].setSelection(true);
+                    } else {
+                        planets[i].setSelection(false);
+                    }
+                }
+            }
+
             function click(event) {
-                console.log('clicked');
                 console.log('x: ' + event.offsetX + ' - y: ' + event.offsetY);
+                detectPlanetOnClick(event.offsetX, event.offsetY);
             }
 
             function mainLoop() {

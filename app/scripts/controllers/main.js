@@ -1,4 +1,5 @@
 
+/* global $:false */
 'use strict';
 
 angular.module('ld30App')
@@ -6,7 +7,13 @@ angular.module('ld30App')
                 $scope,
                 gameOptionsService
                 ) {
-            $scope.clickDifficultyOption = function(diff) {
-                gameOptionsService(diff);
+            $scope.clickStart = function() {
+                var diff = parseInt(
+                        $('#difficulty')
+                        .find('.active')
+                        .find('input')
+                        .val()
+                        );
+                gameOptionsService.setDifficulty(diff);
             };
         });

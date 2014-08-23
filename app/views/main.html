@@ -1,21 +1,21 @@
 
 <div>
-    <h1 class="cover-heading"> World Connecting </h1>
+    <h1 class="cover-heading"> Planet Connection </h1>
     <p class="lead"> how to play, description and stuff like that ... </p>
 
     <br>
 
     <strong> Difficulty: </strong>
     <br>
-    <div class="btn-group" data-toggle="buttons">
-        <label ng-click="clickDifficultyOption(1)" class="btn btn-default">
-            <input type="radio"> easy
+    <div id="difficulty" class="btn-group" data-toggle="buttons">
+        <label class="btn btn-default">
+            <input type="radio" value="1"> easy
         </label>
-        <label ng-click="clickDifficultyOption(2)" class="btn btn-default active">
-            <input type="radio"> medium
+        <label class="btn btn-default active">
+            <input type="radio" value="2"> medium
         </label>
-        <label ng-click="clickDifficultyOption(3)" class="btn btn-default">
-            <input type="radio"> hard
+        <label class="btn btn-default">
+            <input type="radio" value="3"> hard
         </label>
     </div>
 
@@ -24,7 +24,7 @@
     <hr>
 
     <p class="lead">
-        <a ng-href="#/game" class="btn btn-lg btn-primary"> Start Game </a>
+        <a ng-href="#/game" ng-click="clickStart()" class="btn btn-lg btn-primary"> Start Game </a>
     </p>
 </div>
 
