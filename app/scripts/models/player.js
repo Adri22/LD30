@@ -65,7 +65,7 @@ angular.module('ld30App')
             Player.prototype.setBoost = function(b) {
                 this.isBoost = b;
             };
-            
+
             Player.prototype.getState = function() {
                 if (this.isBoost) {
                     return this.playerStates.speed;

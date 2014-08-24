@@ -15,6 +15,10 @@ angular.module('ld30App')
                 this.strokeStyle = '#003300';
                 this.lineWidth = 1;
                 this.rotation = 0;
+                this.connector = {
+                    'connected': false,
+                    'connectorID': null
+                };
             };
 
             Planet.prototype.getID = function() {
@@ -49,6 +53,15 @@ angular.module('ld30App')
                 this.rotation = rot;
             };
 
+            Planet.prototype.setConnector = function(id) {
+                this.connector.connectorID = id;
+                this.connector.connected = true;
+            };
+
+            Planet.prototype.hasConnector = function() {
+                return this.connector.connected;
+            };
+
             Planet.prototype.setSelection = function(s) {
                 this.selected = s;
                 if (this.selected) {
@@ -58,6 +71,10 @@ angular.module('ld30App')
                     this.strokeStyle = '#003300';
                     this.lineWidth = 1;
                 }
+            };
+
+            Planet.prototype.isSelected = function() {
+                return this.selected;
             };
 
             Planet.prototype.renderPlanet = function(ctx, img) {

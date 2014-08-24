@@ -6,7 +6,8 @@ angular.module('ld30App')
                 graphicService,
                 gameOptionsService,
                 Player,
-                Planet
+                Planet,
+                Connector
                 // $scope
                 ) {
 
@@ -77,6 +78,11 @@ angular.module('ld30App')
                     player.setRotation(playerRot + 5 * timeModifier);
                 }
 
+                if (keysDown[17]) {
+                    console.log('key down - 17');
+                    setConnector();
+                }
+
                 for (var i = 0; i < planets.length; i++) {
                     if (planets[i].getRotation() >= 360) {
                         planets[i].setRotation(0);
@@ -89,7 +95,9 @@ angular.module('ld30App')
             }
 
             function planetGenerator() {
+                var minimumDistance = 100;
                 var counter = null;
+
                 switch (difficulty) {
                     case 1:
                         counter = 5;
@@ -105,17 +113,51 @@ angular.module('ld30App')
                         break;
                 }
 
+                var success = function(p) {
+                    collision = true;
+                };
+
+                var error = function(p) {
+                    collision = false;
+                };
+
+                var tmpCounter = counter;
                 do {
-                    var radius = Math.floor((Math.random() * 60) + 20);
+                    var collision = true;
+                    var x, y, radius, p;
 
-                    var x = Math.floor((Math.random() * canvas.width) + 1) + (radius / 2);
-                    var y = Math.floor((Math.random() * canvas.height) + 1);
+                    do {
+                        console.log('generate planet ...' + tmpCounter);
+                        radius = Math.floor((Math.random() * 60) + 20);
+                        x = Math.floor((Math.random() * canvas.width) + 1) + (radius / 2);
+                        y = Math.floor((Math.random() * canvas.height) + 1);
 
-                    var p = new Planet(counter + 1, 'planet' + counter, x, y, radius);
+                        if (tmpCounter !== counter) {
+                            detectPlanet(x - (radius + minimumDistance), y - (radius + minimumDistance), success, error);
+                            if (!collision) {
+                                detectPlanet(x + (radius + minimumDistance), y + (radius + minimumDistance), success, error);
+                            }
+                            if (!collision) {
+                                detectPlanet(x - (radius + minimumDistance), y + (radius + minimumDistance), success, error);
+                            }
+                            if (!collision) {
+                                detectPlanet(x + (radius + minimumDistance), y - (radius + minimumDistance), success, error);
+                            }
+                        }
+
+                        if (tmpCounter === counter) {
+                            p = new Planet(tmpCounter, 'planet' + tmpCounter, x, y, radius);
+                            planets.push(p);
+                            tmpCounter--;
+                        }
+
+                    } while (collision);
+
+                    p = new Planet(tmpCounter, 'planet' + tmpCounter, x, y, radius);
                     // p.showName();
                     planets.push(p);
-                    counter--;
-                } while (counter > 0);
+                    tmpCounter--;
+                } while (tmpCounter > 0);
             }
 
             function renderPlanets(ctx, gfx) {
@@ -130,6 +172,12 @@ angular.module('ld30App')
                 }
             }
 
+            function renderConnectors(ctx, gfx) {
+                for (var i = 0; i < connectors.length; i++) {
+                    connectors[i].renderConnector(ctx, gfx.connectorImage);
+                }
+            }
+
             function render(ctx, gfx, fps) {
                 ctx.drawImage(gfx.bgImage, 0, 0);
 
@@ -140,10 +188,14 @@ angular.module('ld30App')
                 ctx.fillText('fps: ' + fps, 5, 5);
 
                 renderPlanets(ctx, gfx);
+                // render beams here
+                renderConnectors(ctx, gfx);
                 player.renderPlayer(ctx, gfx.playerImage);
             }
 
-            function detectPlanetOnClick(x, y) {
+            function detectPlanet(x, y, successCallback, errorCallback) {
+                var success = successCallback;
+                var error = errorCallback;
                 for (var i = 0; i < planets.length; i++) {
                     var planetPos = planets[i].getPosition();
                     var planetRadius = planets[i].getRadius();
@@ -153,17 +205,42 @@ angular.module('ld30App')
                             (y > (planetPos.y - planetRadius)) &&
                             (y < (planetPos.y + planetRadius))
                             ) {
-                        console.log('planet clicked: ' + planets[i].showName());
-                        planets[i].setSelection(true);
+                        success(planets[i]);
                     } else {
-                        planets[i].setSelection(false);
+                        if (error !== null) {
+                            error(planets[i]);
+                        }
                     }
                 }
             }
 
             function click(event) {
                 console.log('x: ' + event.offsetX + ' - y: ' + event.offsetY);
-                detectPlanetOnClick(event.offsetX, event.offsetY);
+                detectPlanet(event.offsetX, event.offsetY,
+                        function(planet) {
+                            planet.setSelection(true);
+                            console.log('planet clicked: ' + planet.showName());
+                        },
+                        function(planet) {
+                            planet.setSelection(false);
+                        });
+            }
+
+            function setConnector() {
+                var playerPos = player.getPosition();
+                detectPlanet(playerPos.x, playerPos.y,
+                        function(p) {
+                            if (p.isSelected() && !p.hasConnector()) {
+                                var pPos = p.getPosition();
+                                var c = new Connector(connectors.length + 1, pPos.x, pPos.y, p.getID());
+                                for (var i = 0; i < planets.length; i++) {
+                                    if (planets[i].getID() === p.getID()) {
+                                        planets[i].setConnector(c.getID());
+                                    }
+                                }
+                                connectors.push(c);
+                            }
+                        }, null);
             }
 
             function mainLoop() {
@@ -189,6 +266,7 @@ angular.module('ld30App')
             var keysDown = {};
             var player;
             var planets = [];
+            var connectors = [];
             var difficulty;
 
             init(frameWidth, frameHeight, 'gameframe');

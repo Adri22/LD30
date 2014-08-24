@@ -14,6 +14,9 @@ angular.module('ld30App')
                 var playerImage = new Image();
                 playerImage.src = 'images/player1.png';
 
+                var connectorImage = new Image();
+                connectorImage.src = 'images/connector.png';
+
                 var planetImages = [];
                 var planetPaths = [
                     'images/planet1.png',
@@ -31,7 +34,8 @@ angular.module('ld30App')
                 gfx = {
                     'bgImage': bgImage,
                     'playerImage': playerImage,
-                    'planetImages': planetImages
+                    'planetImages': planetImages,
+                    'connectorImage': connectorImage
                 };
 
                 return gfx;
