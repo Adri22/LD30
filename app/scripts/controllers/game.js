@@ -47,40 +47,34 @@ angular.module('ld30App')
 
                 var playerPos = player.getPosition();
                 var playerRot = player.getRotation();
-                
+
                 if (keysDown[38]) {
+
+                    var stepX = playerRot > 180 ? -player.getSpeed() : player.getSpeed();
+                    var stepY = (playerRot > 90) && (playerRot < 270) ? player.getSpeed() : -player.getSpeed();
+
                     console.log('key down - 38');
                     player.setPosition(
-                            playerPos.x,
-                            playerPos.y - 150 * timeModifier
+                            playerPos.x + ((Math.sin(playerRot) * stepX) * timeModifier),
+                            playerPos.y + ((Math.cos(playerRot) * stepY) * timeModifier)
                             );
+                    if (!player.isRotating) {
+                        player.setRotation(playerRot);
+                    }
+
+                    player.setBoost(true);
+                } else {
+                    player.setBoost(false);
                 }
-                if (keysDown[40]) {
-                    console.log('key down - 40');
-                    player.setPosition(
-                            playerPos.x,
-                            playerPos.y + 150 * timeModifier
-                            );
+
+                if (keysDown[37] && player.getState() !== 1) {
+                    console.log('key down - 37 - playerRotation: ' + playerRot);
+                    player.setRotation(playerRot - 5 * timeModifier);
                 }
-                if (keysDown[37]) {
-                    console.log('key down - 37');
+
+                if (keysDown[39] && player.getState() !== 1) {
+                    console.log('key down - 39 - playerRotation: ' + playerRot);
                     player.setRotation(playerRot + 5 * timeModifier);
-                    /*
-                     player.setPosition(
-                     playerPos.x - 10 * timeModifier,
-                     playerPos.y
-                     );
-                     */
-                }
-                if (keysDown[39]) {
-                    console.log('key down - 39');
-                    player.setRotation(playerRot - 10 * timeModifier);
-                    /*
-                     player.setPosition(
-                     playerPos.x + 10 * timeModifier,
-                     playerPos.y
-                     );
-                     */
                 }
 
                 for (var i = 0; i < planets.length; i++) {
@@ -146,7 +140,7 @@ angular.module('ld30App')
                 ctx.fillText('fps: ' + fps, 5, 5);
 
                 renderPlanets(ctx, gfx);
-                player.renderPlayer(ctx /*, img*/);
+                player.renderPlayer(ctx, gfx.playerImage);
             }
 
             function detectPlanetOnClick(x, y) {

@@ -11,6 +11,9 @@ angular.module('ld30App')
                 var bgImage = new Image();
                 bgImage.src = 'images/background1.png';
 
+                var playerImage = new Image();
+                playerImage.src = 'images/player1.png';
+
                 var planetImages = [];
                 var planetPaths = [
                     'images/planet1.png',
@@ -18,7 +21,7 @@ angular.module('ld30App')
                     'images/planet3.png',
                     'images/planet4.png'
                 ];
-                
+
                 for (var i = 0; i < planetPaths.length; i++) {
                     var planetImage = new Image();
                     planetImage.src = planetPaths[i];
@@ -27,6 +30,7 @@ angular.module('ld30App')
 
                 gfx = {
                     'bgImage': bgImage,
+                    'playerImage': playerImage,
                     'planetImages': planetImages
                 };
 
