@@ -36,28 +36,51 @@ angular.module('ld30App')
                 player = new Player('test', 0, 0);
 
                 planetGenerator();
+                reset();
             }
 
-            /*
-             function reset() {
-             player.getPosition().x = canvas.width / 2;
-             player.getPosition().y = canvas.height / 2;
-             }
-             */
+            function reset() {
+                player.setPosition(canvas.width / 2, canvas.height / 2);
+            }
 
             function update(timeModifier) {
 
+                var playerPos = player.getPosition();
+                var playerRot = player.getRotation();
+                
                 if (keysDown[38]) {
-                    player.getPosition().y -= 1 * timeModifier;
+                    console.log('key down - 38');
+                    player.setPosition(
+                            playerPos.x,
+                            playerPos.y - 150 * timeModifier
+                            );
                 }
                 if (keysDown[40]) {
-                    player.getPosition().y += 1 * timeModifier;
+                    console.log('key down - 40');
+                    player.setPosition(
+                            playerPos.x,
+                            playerPos.y + 150 * timeModifier
+                            );
                 }
                 if (keysDown[37]) {
-                    player.getPosition().x -= 1 * timeModifier;
+                    console.log('key down - 37');
+                    player.setRotation(playerRot + 5 * timeModifier);
+                    /*
+                     player.setPosition(
+                     playerPos.x - 10 * timeModifier,
+                     playerPos.y
+                     );
+                     */
                 }
                 if (keysDown[39]) {
-                    player.getPosition().x += 1 * timeModifier;
+                    console.log('key down - 39');
+                    player.setRotation(playerRot - 10 * timeModifier);
+                    /*
+                     player.setPosition(
+                     playerPos.x + 10 * timeModifier,
+                     playerPos.y
+                     );
+                     */
                 }
 
                 for (var i = 0; i < planets.length; i++) {
@@ -72,7 +95,6 @@ angular.module('ld30App')
             }
 
             function planetGenerator() {
-
                 var counter = null;
                 switch (difficulty) {
                     case 1:
@@ -124,6 +146,7 @@ angular.module('ld30App')
                 ctx.fillText('fps: ' + fps, 5, 5);
 
                 renderPlanets(ctx, gfx);
+                player.renderPlayer(ctx /*, img*/);
             }
 
             function detectPlanetOnClick(x, y) {
