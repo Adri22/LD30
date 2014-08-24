@@ -59,6 +59,16 @@ angular.module('ld30App')
                 if (keysDown[39]) {
                     player.getPosition().x += 1 * timeModifier;
                 }
+
+                for (var i = 0; i < planets.length; i++) {
+                    if (planets[i].getRotation() >= 360) {
+                        planets[i].setRotation(0);
+                    }
+                    planets[i].setRotation(
+                            planets[i].getRotation() +
+                            (1 / (planets[i].getRadius() / 10)) * timeModifier
+                            );
+                }
             }
 
             function planetGenerator() {
@@ -85,16 +95,22 @@ angular.module('ld30App')
                     var x = Math.floor((Math.random() * canvas.width) + 1) + (radius / 2);
                     var y = Math.floor((Math.random() * canvas.height) + 1);
 
-                    var p = new Planet('planet' + counter, x, y, radius);
+                    var p = new Planet(counter + 1, 'planet' + counter, x, y, radius);
                     // p.showName();
                     planets.push(p);
                     counter--;
                 } while (counter > 0);
             }
 
-            function renderPlanets(ctx) {
+            function renderPlanets(ctx, gfx) {
+                if (gfx.planetImages.length < planets.length) {
+                    for (var index = 0; index < planets.length; index++) {
+                        gfx.planetImages.push(gfx.planetImages[index]);
+                    }
+                }
                 for (var i = 0; i < planets.length; i++) {
-                    planets[i].renderPlanet(ctx);
+                    var planetImg = gfx.planetImages[i];
+                    planets[i].renderPlanet(ctx, planetImg);
                 }
             }
 
@@ -107,7 +123,7 @@ angular.module('ld30App')
                 ctx.textBaseline = 'top';
                 ctx.fillText('fps: ' + fps, 5, 5);
 
-                renderPlanets(ctx);
+                renderPlanets(ctx, gfx);
             }
 
             function detectPlanetOnClick(x, y) {

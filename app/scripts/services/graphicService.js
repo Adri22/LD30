@@ -11,8 +11,23 @@ angular.module('ld30App')
                 var bgImage = new Image();
                 bgImage.src = 'images/background1.png';
 
+                var planetImages = [];
+                var planetPaths = [
+                    'images/planet1.png',
+                    'images/planet2.png',
+                    'images/planet3.png',
+                    'images/planet4.png'
+                ];
+                
+                for (var i = 0; i < planetPaths.length; i++) {
+                    var planetImage = new Image();
+                    planetImage.src = planetPaths[i];
+                    planetImages.push(planetImage);
+                }
+
                 gfx = {
-                    'bgImage': bgImage
+                    'bgImage': bgImage,
+                    'planetImages': planetImages
                 };
 
                 return gfx;

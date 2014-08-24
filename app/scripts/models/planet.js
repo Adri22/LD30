@@ -5,7 +5,8 @@
 angular.module('ld30App')
         .factory('Planet', function() {
 
-            var Planet = function(name, x, y, r) {
+            var Planet = function(id, name, x, y, r) {
+                this.id = id;
                 this.name = name;
                 this.xPos = x;
                 this.yPos = y;
@@ -13,6 +14,11 @@ angular.module('ld30App')
                 this.selected = false;
                 this.strokeStyle = '#003300';
                 this.lineWidth = 1;
+                this.rotation = 0;
+            };
+
+            Planet.prototype.getID = function() {
+                return this.id;
             };
 
             Planet.prototype.showName = function() {
@@ -35,6 +41,14 @@ angular.module('ld30App')
                 return this.radius;
             };
 
+            Planet.prototype.getRotation = function() {
+                return this.rotation;
+            };
+
+            Planet.prototype.setRotation = function(rot) {
+                this.rotation = rot;
+            };
+
             Planet.prototype.setSelection = function(s) {
                 this.selected = s;
                 if (this.selected) {
@@ -46,14 +60,25 @@ angular.module('ld30App')
                 }
             };
 
-            Planet.prototype.renderPlanet = function(ctx) {
+            Planet.prototype.renderPlanet = function(ctx, img) {
+                ctx.save();
+                ctx.translate(this.xPos, this.yPos);
+                ctx.rotate(this.rotation);
                 ctx.beginPath();
-                ctx.arc(this.xPos, this.yPos, this.radius, 0, 2 * Math.PI, false);
-                ctx.fillStyle = 'green';
-                ctx.fill();
+                ctx.arc(0, 0, this.radius, 0, 2 * Math.PI, false);
+                // ctx.fillStyle = 'green';
+                // ctx.fill();
                 ctx.lineWidth = this.lineWidth;
                 ctx.strokeStyle = this.strokeStyle;
                 ctx.stroke();
+                ctx.drawImage(
+                        img,
+                        -this.radius,
+                        -this.radius,
+                        (this.radius * 2),
+                        (this.radius * 2)
+                        );
+                ctx.restore();
             };
 
             return Planet;

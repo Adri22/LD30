@@ -2,7 +2,7 @@
 
 'use strict';
 
-angular.module('ld30App')
+angular.module('ld30App') // not necessary
         .service('renderService', function() {
 
             function drawHUD(ctx) {
@@ -15,7 +15,7 @@ angular.module('ld30App')
 
             return function(ctx) {
                 // ctx.drawImage(, 0, 0);
-                
+
                 drawHUD(ctx);
             };
 
