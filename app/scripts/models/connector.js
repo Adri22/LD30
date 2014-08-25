@@ -13,6 +13,7 @@ angular.module('ld30App')
                 this.width = 32;
                 this.height = 32;
                 this.planetID = pID;
+                this.connectedTo = [];
             };
 
             Connector.prototype.getID = function() {
@@ -29,6 +30,14 @@ angular.module('ld30App')
             Connector.prototype.setPosition = function(x, y) {
                 this.xPos = x;
                 this.yPos = y;
+            };
+
+            Connector.prototype.setConnectionTo = function(id) {
+                this.connectedTo.push(id);
+            };
+
+            Connector.prototype.getConnectors = function() {
+                return this.connectedTo;
             };
 
             Connector.prototype.renderConnector = function(ctx, img) {

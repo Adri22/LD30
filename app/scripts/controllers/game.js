@@ -7,12 +7,13 @@ angular.module('ld30App')
                 gameOptionsService,
                 Player,
                 Planet,
-                Connector
-                // $scope
+                Connector,
+                Beam,
+                $scope
                 ) {
 
             function init(width, height, canvasFrame) {
-
+                gameEnd = false;
                 canvas = document.getElementById(canvasFrame);
                 ctx = canvas.getContext('2d');
                 canvas.width = width;
@@ -41,11 +42,12 @@ angular.module('ld30App')
             }
 
             function reset() {
+                timerEnd = time + (30 * 1000);
+                beamCounter = 0;
                 player.setPosition(canvas.width / 2, canvas.height / 2);
             }
 
             function update(timeModifier) {
-
                 var playerPos = player.getPosition();
                 var playerRot = player.getRotation();
 
@@ -54,7 +56,6 @@ angular.module('ld30App')
                     var stepX = playerRot > 180 ? -player.getSpeed() : player.getSpeed();
                     var stepY = (playerRot > 90) && (playerRot < 270) ? player.getSpeed() : -player.getSpeed();
 
-                    console.log('key down - 38');
                     player.setPosition(
                             playerPos.x + ((Math.sin(playerRot) * stepX) * timeModifier),
                             playerPos.y + ((Math.cos(playerRot) * stepY) * timeModifier)
@@ -69,19 +70,15 @@ angular.module('ld30App')
                 }
 
                 if (keysDown[37] && player.getState() !== 1) {
-                    console.log('key down - 37 - playerRotation: ' + playerRot);
                     player.setRotation(playerRot - 5 * timeModifier);
                 }
 
                 if (keysDown[39] && player.getState() !== 1) {
-                    console.log('key down - 39 - playerRotation: ' + playerRot);
                     player.setRotation(playerRot + 5 * timeModifier);
                 }
 
-                if (keysDown[17]) {
-                    console.log('key down - 17');
-                    setConnector();
-                }
+                setConnector();
+                createBeams();
 
                 for (var i = 0; i < planets.length; i++) {
                     if (planets[i].getRotation() >= 360) {
@@ -92,6 +89,8 @@ angular.module('ld30App')
                             (1 / (planets[i].getRadius() / 10)) * timeModifier
                             );
                 }
+
+                timer = timerEnd - time;
             }
 
             function planetGenerator() {
@@ -127,7 +126,6 @@ angular.module('ld30App')
                     var x, y, radius, p;
 
                     do {
-                        console.log('generate planet ...' + tmpCounter);
                         radius = Math.floor((Math.random() * 60) + 20);
                         x = Math.floor((Math.random() * canvas.width) + 1) + (radius / 2);
                         y = Math.floor((Math.random() * canvas.height) + 1);
@@ -154,7 +152,6 @@ angular.module('ld30App')
                     } while (collision);
 
                     p = new Planet(tmpCounter, 'planet' + tmpCounter, x, y, radius);
-                    // p.showName();
                     planets.push(p);
                     tmpCounter--;
                 } while (tmpCounter > 0);
@@ -178,8 +175,19 @@ angular.module('ld30App')
                 }
             }
 
+            function renderBeams(ctx) {
+                for (var i = 0; i < beams.length; i++) {
+                    beams[i].renderBeam(ctx);
+                }
+            }
+
             function render(ctx, gfx, fps) {
                 ctx.drawImage(gfx.bgImage, 0, 0);
+
+                renderPlanets(ctx, gfx);
+                renderBeams(ctx);
+                renderConnectors(ctx, gfx);
+                player.renderPlayer(ctx, gfx.playerImage);
 
                 ctx.fillStyle = 'rgb(255, 255, 255)';
                 ctx.font = '15px Helvetica';
@@ -187,10 +195,19 @@ angular.module('ld30App')
                 ctx.textBaseline = 'top';
                 ctx.fillText('fps: ' + fps, 5, 5);
 
-                renderPlanets(ctx, gfx);
-                // render beams here
-                renderConnectors(ctx, gfx);
-                player.renderPlayer(ctx, gfx.playerImage);
+                ctx.fillStyle = 'rgb(255, 255, 255)';
+                ctx.font = '20px Helvetica';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.fillText('time left: ' + Math.floor(timer / 1000) + ' | beams created: ' + beamCounter, 100, 5);
+
+                if (gameEnd) {
+                    ctx.fillStyle = 'rgb(255, 0, 0)';
+                    ctx.font = '35px Helvetica';
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText('Finished', 500, 400);
+                }
             }
 
             function detectPlanet(x, y, successCallback, errorCallback) {
@@ -215,11 +232,9 @@ angular.module('ld30App')
             }
 
             function click(event) {
-                console.log('x: ' + event.offsetX + ' - y: ' + event.offsetY);
                 detectPlanet(event.offsetX, event.offsetY,
                         function(planet) {
                             planet.setSelection(true);
-                            console.log('planet clicked: ' + planet.showName());
                         },
                         function(planet) {
                             planet.setSelection(false);
@@ -243,6 +258,35 @@ angular.module('ld30App')
                         }, null);
             }
 
+            function createBeams() {
+                for (var i = 0; i < connectors.length; i++) {
+                    for (var x = 0; x < connectors.length; x++) {
+                        if (connectors[i].getID() !== connectors[x].getID()) {
+                            var cTmpConnectors1 = connectors[i].getConnectors();
+                            var cTmpConnectors2 = connectors[x].getConnectors();
+                            var idTmp = connectors[i].getID();
+                            if (!(cTmpConnectors2[idTmp])) {
+                                var c1Pos = connectors[i].getPosition();
+                                var c2Pos = connectors[x].getPosition();
+                                var connectorIDs = [connectors[i].getID(), connectors[x].getID()];
+                                var b = new Beam(
+                                        beams.length + 1,
+                                        c1Pos.x,
+                                        c1Pos.y,
+                                        c2Pos.x,
+                                        c2Pos.y,
+                                        connectorIDs
+                                        );
+                                connectors[i].setConnectionTo(connectors[x].getID());
+                                connectors[x].setConnectionTo(connectors[i].getID());
+                                beams.push(b);
+                                beamCounter++;
+                            }
+                        }
+                    }
+                }
+            }
+
             function mainLoop() {
                 var now = Date.now();
                 var delta = now - time;
@@ -253,11 +297,20 @@ angular.module('ld30App')
 
                 time = now;
 
-                w.requestAnimationFrame(mainLoop);
+                if (timer <= 0 && !gameEnd) {
+                    // alert('you created ' + $scope.beamCounter + ' beams between planets!');
+                    gameEnd = true;
+                    w.requestAnimationFrame(mainLoop);
+                } else if (!gameEnd) {
+                    w.requestAnimationFrame(mainLoop);
+                }
             }
 
             var w;
             var time;
+            var timer;
+            var timerEnd;
+            var gameEnd;
             var canvas;
             var ctx;
             var gfx;
@@ -267,7 +320,9 @@ angular.module('ld30App')
             var player;
             var planets = [];
             var connectors = [];
+            var beams = [];
             var difficulty;
+            var beamCounter;
 
             init(frameWidth, frameHeight, 'gameframe');
             mainLoop();
