@@ -42,7 +42,24 @@ angular.module('ld30App')
             }
 
             function reset() {
-                timerEnd = time + (30 * 1000);
+                var seconds;
+
+                switch (difficulty) {
+                    case 1:
+                        seconds = 60;
+                        break;
+                    case 2:
+                        seconds = 40;
+                        break;
+                    case 3:
+                        seconds = 30;
+                        break;
+                    default:
+                        seconds = 60;
+                        break;
+                }
+
+                timerEnd = time + (seconds * 1000);
                 beamCounter = 0;
                 player.setPosition(canvas.width / 2, canvas.height / 2);
             }
@@ -94,22 +111,7 @@ angular.module('ld30App')
 
             function planetGenerator() {
                 var minimumDistance = 100;
-                var counter = null;
-
-                switch (difficulty) {
-                    case 1:
-                        counter = 5;
-                        break;
-                    case 2:
-                        counter = 10;
-                        break;
-                    case 3:
-                        counter = 15;
-                        break;
-                    default:
-                        counter = 5;
-                        break;
-                }
+                var counter = 15;
 
                 var success = function(p) {
                     collision = true;
