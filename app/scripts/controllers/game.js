@@ -78,7 +78,6 @@ angular.module('ld30App')
                 }
 
                 setConnector();
-                createBeams();
 
                 for (var i = 0; i < planets.length; i++) {
                     if (planets[i].getRotation() >= 360) {
@@ -199,7 +198,7 @@ angular.module('ld30App')
                 ctx.font = '20px Helvetica';
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
-                ctx.fillText('time left: ' + Math.floor(timer / 1000) + ' | beams created: ' + beamCounter, 100, 5);
+                ctx.fillText('time left: ' + Math.floor(timer / 1000) + ' | connections: ' + beamCounter, 100, 5);
 
                 if (gameEnd) {
                     ctx.fillStyle = 'rgb(255, 0, 0)';
@@ -253,38 +252,35 @@ angular.module('ld30App')
                                         planets[i].setConnector(c.getID());
                                     }
                                 }
-                                connectors.push(c);
+                                var con = createConnections(c);
+                                connectors.push(con);
                             }
                         }, null);
             }
 
-            function createBeams() {
+            function createConnections(c) {
                 for (var i = 0; i < connectors.length; i++) {
-                    for (var x = 0; x < connectors.length; x++) {
-                        if (connectors[i].getID() !== connectors[x].getID()) {
-                            var cTmpConnectors1 = connectors[i].getConnectors();
-                            var cTmpConnectors2 = connectors[x].getConnectors();
-                            var idTmp = connectors[i].getID();
-                            if (!(cTmpConnectors2[idTmp])) {
-                                var c1Pos = connectors[i].getPosition();
-                                var c2Pos = connectors[x].getPosition();
-                                var connectorIDs = [connectors[i].getID(), connectors[x].getID()];
-                                var b = new Beam(
-                                        beams.length + 1,
-                                        c1Pos.x,
-                                        c1Pos.y,
-                                        c2Pos.x,
-                                        c2Pos.y,
-                                        connectorIDs
-                                        );
-                                connectors[i].setConnectionTo(connectors[x].getID());
-                                connectors[x].setConnectionTo(connectors[i].getID());
-                                beams.push(b);
-                                beamCounter++;
-                            }
-                        }
+                    var cTmpConnectors = connectors[i].getConnectors();
+                    var idTmp = connectors[i].getID();
+                    if (!(cTmpConnectors[idTmp])) {
+                        var c1Pos = connectors[i].getPosition();
+                        var c2Pos = c.getPosition();
+                        var connectorIDs = [connectors[i].getID(), c.getID()];
+                        var b = new Beam(
+                                beams.length + 1,
+                                c1Pos.x,
+                                c1Pos.y,
+                                c2Pos.x,
+                                c2Pos.y,
+                                connectorIDs
+                                );
+                        connectors[i].setConnectionTo(c.getID());
+                        c.setConnectionTo(connectors[i].getID());
+                        beams.push(b);
+                        beamCounter++;
                     }
                 }
+                return c;
             }
 
             function mainLoop() {
